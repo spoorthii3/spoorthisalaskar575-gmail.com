@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void computePrefixArray(char* pattern, int* prefixArray, int patternLength) {
+    int length = 0;
+    int i = 1;
+    prefixArray[0] = 0;
+
+    while (i < patternLength) {
+        if (pattern[i] == pattern[length]) {
+            length++;
+            prefixArray[i] = length;
+            i++;
+        } else {
+            if (length != 0) {
+                length = prefixArray[length - 1];
+            } else {
+                prefixArray[i] = 0;
+                i++;
+            }
+        }
+    }
+}
+
+char* shortestPalindrome(char* s) {
+    int n = strlen(s);
+    char* combinedString = (char*)malloc(2 * n + 2);
+    strcpy(combinedString, s);
+    combinedString[n] = '#';
+    for (int i = n - 1, j = n + 1; i >= 0; i--, j++) {
+        combinedString[j] = s[i];
+    }
+    combinedString[2 * n + 1] = '\0';
+
+    int* prefixArray = (int*)malloc((2 * n + 1) * sizeof(int));
+    computePrefixArray(combinedString, prefixArray, 2 * n + 1);
+    int length = prefixArray[2 * n];
+    char* result = (char*)malloc((n - length) * sizeof(char) + n + 1);
+    strcpy(result, &combinedString[n + 1 + length]);
+    strcat(result, s);
+
+    free(combinedString);
+    free(prefixArray);
+
+    return result;
+}
+
+int main() {
+    char s[] = "aacecaaa";
+    char* result = shortestPalindrome(s);
+
+    printf("Shortest palindrome: %s\n", result);
+
+    free(result);
+
+    return 0;
+}
